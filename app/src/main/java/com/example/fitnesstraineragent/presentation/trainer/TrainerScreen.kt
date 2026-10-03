@@ -15,10 +15,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -40,6 +42,7 @@ import com.example.fitnesstraineragent.R
 @Composable
 fun TrainerScreen(
     onBackClick: () -> Unit,
+    onDietPlanReady: () -> Unit,
     viewModel: TrainerViewModel = viewModel()
 ) {
 
@@ -62,6 +65,9 @@ fun TrainerScreen(
     val answeredQuestionId by viewModel.answeredQuestionId
         .collectAsStateWithLifecycle()
 
+    val dietPlan by viewModel.dietPlan
+        .collectAsStateWithLifecycle()
+
     val listState = rememberLazyListState()
 
     LaunchedEffect(messages.size) {
@@ -73,6 +79,14 @@ fun TrainerScreen(
             )
         }
     }
+
+    LaunchedEffect(dietPlan) {
+
+        if (dietPlan != null) {
+            onDietPlanReady()
+        }
+    }
+
 
     Scaffold(
 

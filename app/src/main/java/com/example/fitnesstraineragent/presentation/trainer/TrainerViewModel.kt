@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fitnesstraineragent.agent.AgentRunner
 import com.example.fitnesstraineragent.data.DietQuestions
+import com.example.fitnesstraineragent.data.model.DietPlan
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +28,9 @@ class TrainerViewModel(
 
     private val _answeredQuestionId = MutableStateFlow<String?>(null)
     val answeredQuestionId = _answeredQuestionId.asStateFlow()
+
+    private val _dietPlan = MutableStateFlow<DietPlan?>(null)
+    val dietPlan = _dietPlan.asStateFlow()
 
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val messages = _messages.asStateFlow()
@@ -239,11 +244,24 @@ class TrainerViewModel(
                     )
                     .collect { response ->
 
-                        _messages.value =
-                            _messages.value + ChatMessage(
-                                text = response,
-                                isUser = false
+//                        _messages.value =
+//                            _messages.value + ChatMessage(
+//                                text = response,
+//                                isUser = false
+//                            )
+
+                        try {
+                            val plan = Gson().fromJson(
+                                response,
+                                DietPlan::class.java
                             )
+
+                            _dietPlan.value = plan
+
+                        } catch (e: Exception) {
+                            _error.value = "Unable to parse diet plan"
+                        }
+
                     }
 
             } catch (e: CancellationException) {
